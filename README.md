@@ -22,4 +22,8 @@ RestMall 쇼핑몰 API 구축 프로젝트
 - 설계된 DB에 맞게 엔티티 생성
 - User와 Product의 매핑 테이블을 Cart(장바구니)로 사용하기로 함
 
+## 2025-09-08 (월)
+- Security 설정 적용
+- 로그인, 회원가입 api 개발(validation 추가 예정)
+
   
