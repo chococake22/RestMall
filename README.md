@@ -26,4 +26,9 @@ RestMall 쇼핑몰 API 구축 프로젝트
 - Security 설정 적용
 - 로그인, 회원가입 api 개발(validation 추가 예정)
 
+## 2025-09-10 (수)
+- 예외처리 전역 설정
+- 회원가입 validation 추가
+* 로그인시 encode된 값이 authentication 객체에 들어가야 함
+
   

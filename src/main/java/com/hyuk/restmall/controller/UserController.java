@@ -1,8 +1,11 @@
 package com.hyuk.restmall.controller;
 
-import com.hyuk.restmall.dto.UserLogin;
-import com.hyuk.restmall.dto.UserSignUp;
+
+import com.hyuk.restmall.dto.UserLoginDto;
+import com.hyuk.restmall.dto.UserSignUpDto;
 import com.hyuk.restmall.service.UserService;
+import com.hyuk.restmall.utils.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +14,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -31,24 +38,16 @@ public class UserController {
      * @return
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLogin userLogin) {
+    public ResponseEntity<ApiResponse> login(@RequestBody UserLoginDto userLoginDto) {
 
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(), userLoginDto.getPassword());
 
-        try {
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword());
+        Authentication auth = authenticationManager.authenticate(authenticationToken);
 
-            Authentication auth = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
-        }
-
-        return ResponseEntity.ok("success");
-
+        return ResponseEntity.ok().body(new ApiResponse(true, "로그인이 성공적으로 완료되었습니다."));
     }
 
 
@@ -62,23 +61,15 @@ public class UserController {
      * @return
      */
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody UserSignUp userSignUp) {
+    public ResponseEntity<ApiResponse> signup(@Valid @RequestBody UserSignUpDto userSignUpDto, BindingResult bindingResult) {
 
-
-        try {
-            userService.signup(userSignUp);
-        } catch (RuntimeException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("서버 오류 발생");
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(new ApiResponse(false, errorMsg));
         }
 
-        return ResponseEntity.ok("success");
+        userService.signup(userSignUpDto);
 
+        return ResponseEntity.ok().body(new ApiResponse(true, "회원가입이 성공적으로 완료되었습니다."));
     }
-
 }

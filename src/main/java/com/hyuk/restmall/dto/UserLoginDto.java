@@ -4,16 +4,10 @@ package com.hyuk.restmall.dto;
 import lombok.Data;
 
 @Data
-public class UserSignUp {
+public class UserLoginDto {
 
     private String email;
     private String password;
-
-    private String passwordChk;
-    private String name;
-    private String phone;
-
-
 
 
 }
