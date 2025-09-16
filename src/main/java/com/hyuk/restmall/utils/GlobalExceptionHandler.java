@@ -13,6 +13,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
+
+        System.out.println(ex);
         return ResponseEntity
                 .badRequest()
                 .body(new ApiResponse(false, ex.getMessage()));
@@ -21,6 +23,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse> handleAuthenticationException(AuthenticationException ex) {
         String message;
+
+        System.out.println(ex);
 
         if (ex instanceof UsernameNotFoundException) {
             message = "없는 사용자입니다.";

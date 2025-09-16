@@ -25,9 +25,14 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/login", "/api/signup").permitAll()
+                        .requestMatchers("/api/login", "/api/signup", "/api/user").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .formLogin(form -> form.disable()) // 기본 formLogin 사용 안함
+
+
+                .sessionManagement(session -> session
+                        .sessionFixation().migrateSession());
 
         return http.build();
     }
@@ -49,7 +54,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
-
 }

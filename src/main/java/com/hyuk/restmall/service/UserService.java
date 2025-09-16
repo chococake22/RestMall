@@ -26,6 +26,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        System.out.println("email: " + email);
 
         // 반드시 bcrypt로 인코딩된 값이 authentication 객체에 들어가야 한다.
         return User.builder()
@@ -33,6 +34,7 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword())
                 .name(user.getName())
                 .phone(user.getPhone())
+
                 .build();
     }
 
