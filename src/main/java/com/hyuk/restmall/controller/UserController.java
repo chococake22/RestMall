@@ -5,7 +5,9 @@ import com.hyuk.restmall.dto.UserLoginDto;
 import com.hyuk.restmall.dto.UserSignUpDto;
 import com.hyuk.restmall.service.UserService;
 import com.hyuk.restmall.utils.ApiResponse;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +45,10 @@ public class UserController {
      * @return
      */
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(
-            @RequestBody UserLoginDto userLoginDto,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ApiResponse> login(@RequestBody UserLoginDto userLoginDto,
+                                             HttpServletRequest request,
+                                             HttpServletResponse response
+                                            ) {
 
         try {
             // 1. Authentication 생성
@@ -71,7 +73,17 @@ public class UserController {
                     context
             );
 
-            System.out.println("Authentication: " + auth);
+//            Cookie cookie = new Cookie("JSESSIONID", session.getId());
+//            cookie.setHttpOnly(true);
+//            cookie.setMaxAge(10);
+//            cookie.setPath("/");    // 모든 api 요청에 쿠키를 담아서 보낸다
+//            response.addCookie(cookie);
+
+            session.setMaxInactiveInterval(60);
+
+
+            System.out.println("session Id: " + session.getId());
+
 
             return ResponseEntity.ok().body(new ApiResponse(true, "로그인이 성공적으로 완료되었습니다."));
 
@@ -90,7 +102,6 @@ public class UserController {
         }
     }
 
-
     /**
      * 회원가입
      * @param : email
@@ -101,7 +112,8 @@ public class UserController {
      * @return
      */
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> signup(@Valid @RequestBody UserSignUpDto userSignUpDto, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse> signup(@Valid @RequestBody UserSignUpDto userSignUpDto,
+                                              BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
@@ -114,21 +126,31 @@ public class UserController {
     }
 
     /**
-     * 사용자 정보 조회
+     * 현재 로그인한 사용자 정보 조회
      * @return
      */
     @GetMapping("/user")
-    public ResponseEntity<Map<String, Object>> getUser(@AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<Map<String, Object>> getUser(@AuthenticationPrincipal UserDetails user, HttpServletRequest request) {
+
+
+        // 기존 세션 가져오기 (없으면 null 반환)
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            System.out.println("세션 없음");
+        } else {
+            System.out.println("세션 야이디: " + session.getId());
+        }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-
         System.out.println("========");
         System.out.println(auth);
+        System.out.println("==== user ====");
+        System.out.println(user);
 
         HashMap<String, Object> result = new HashMap<>();
-        result.put("authentication", auth);
-
+        result.put("user", auth.getPrincipal());
 
         return ResponseEntity.ok().body(result);
     }

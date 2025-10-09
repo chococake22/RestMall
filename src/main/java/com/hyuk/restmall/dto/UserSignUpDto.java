@@ -1,12 +1,16 @@
 package com.hyuk.restmall.dto;
 
 
+import com.hyuk.restmall.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Data;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Data
+@Builder
 public class UserSignUpDto {
 
     @NotBlank(message = "이메일은 필수 입력 값입니다.")

@@ -27,14 +27,19 @@ public class UserService implements UserDetailsService {
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         System.out.println("email: " + email);
+        System.out.println("id: " + user.getId());
 
         // 반드시 bcrypt로 인코딩된 값이 authentication 객체에 들어가야 한다.
         return User.builder()
+                .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .name(user.getName())
                 .phone(user.getPhone())
-
+                .createdUser(user.getEmail())
+                .createdAt(user.getCreatedAt())
+                .updatedUser(user.getUpdatedUser())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 
@@ -53,14 +58,9 @@ public class UserService implements UserDetailsService {
 
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-        User user = new User(userSignUpDto.getEmail()
-                        , bCryptPasswordEncoder.encode(userSignUpDto.getPassword())
-                        , userSignUpDto.getName()
-                        , userSignUpDto.getPhone()
-                        , userSignUpDto.getEmail()
-                        , userSignUpDto.getEmail()
-                    );
-
-        userRepository.save(user);
+        userRepository.save(new User(userSignUpDto.getEmail(),
+                            bCryptPasswordEncoder.encode(userSignUpDto.getPassword()),
+                            userSignUpDto.getEmail(),
+                            userSignUpDto.getName()));
     }
 }

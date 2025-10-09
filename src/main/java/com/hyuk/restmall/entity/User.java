@@ -93,12 +93,22 @@ public class User implements UserDetails {
     }
 
     @Builder
-    public User(String email, String password, String name, String phone, String createdUser, String updatedUser) {
+    public User(Long id, String email, String password, String name, String phone, String createdUser, LocalDateTime createdAt, String updatedUser, LocalDateTime updatedAt) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
         this.createdUser = createdUser;
+        this.createdAt = createdAt;
         this.updatedUser = updatedUser;
+        this.updatedAt = updatedAt;
+    }
+
+    public User(String email, String password, String name, String phone) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.phone = phone;
     }
 }
